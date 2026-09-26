@@ -1,0 +1,6 @@
+{
+  "name": "OWASP_A03_OS_Command_Injection",
+  "search": "index=web_logs sourcetype=\"access_combined\" | eval payload=urldecode(_raw) | regex payload=\"(?i)(;\\s*(cat|ls|id|whoami|nc|bash|powershell|cmd|wget|curl|chmod|chown)\\b|`.*`|\\$\(.*\)|\\|\\s*(bash|sh|cmd|powershell))\" | stats count values(payload) as execution_samples by src_ip, uri_path, status",
+  "cron_schedule": "*/5 * * * *",
+  "description": "OWASP A03: Web sorqularinda emeliyyat sistemi komandalarinin oturulmesini tespit eder."
+}
