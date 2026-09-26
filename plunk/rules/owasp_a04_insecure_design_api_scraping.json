@@ -1,6 +1,0 @@
-{
-  "name": "OWASP_A04_API_Scraper_Exhaustion",
-  "search": "index=web_logs sourcetype=\"access_combined\" uri_path=\"/api/*\" | stats count dc(uri_path) as distinct_api_endpoints by src_ip, http_user_agent | where count > 500 AND distinct_api_endpoints > 15",
-  "cron_schedule": "*/5 * * * *",
-  "description": "OWASP A04: Avtomatlasdirilmis API datasi toplama ve resurs tuketme hucumlarini tespit eder."
-}
