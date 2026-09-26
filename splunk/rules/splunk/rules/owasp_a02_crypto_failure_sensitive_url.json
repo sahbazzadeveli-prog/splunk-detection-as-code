@@ -1,6 +1,0 @@
-{
-  "name": "OWASP_A02_Sensitive_Data_In_URL",
-  "search": "index=web_logs sourcetype=\"access_combined\" http_method=\"GET\" | regex uri_query=\"(?i)(password=|pass=|secret=|token=|api_key=|bearer=|auth_token=)\" | stats count values(uri_query) as leaked_query_sample by src_ip, uri_path, http_user_agent",
-  "cron_schedule": "*/10 * * * *",
-  "description": "OWASP A02: GET parametrlerinde aciq metn sifre ve ya token oturulmesini tespit eder."
-}
