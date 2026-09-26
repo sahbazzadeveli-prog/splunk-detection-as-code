@@ -1,0 +1,6 @@
+{
+  "name": "OWASP_A03_SQL_Injection_Attempt",
+  "search": "index=web_logs sourcetype=\"access_combined\" | eval decoded_payload=urldecode(_raw) | regex decoded_payload=\"(?i)(\\bUNION\\b.*\\bSELECT\\b|\\bSELECT\\b.*\\bFROM\\b|\\bINSERT\\b.*\\bINTO\\b|\\bSLEEP\(\\d+\)|\\bBENCHMARK\\(\\d+|\\bWAITFOR\\b\\s+\\bDELAY\\b|' OR '1'='1|--\\s*$|\\bAND\\b\\s+\\d+=\\d+)\" | stats count values(uri_path) as attacked_endpoints values(decoded_payload) as sample_payload by src_ip, http_user_agent, status",
+  "cron_schedule": "*/5 * * * *",
+  "description": "OWASP A03: SQL Injection yuklerini ve hucum cehdlerini tespit eder."
+}
