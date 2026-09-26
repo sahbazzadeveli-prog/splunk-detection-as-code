@@ -1,0 +1,6 @@
+{
+  "name": "OWASP_A01_IDOR_Object_Enumeration",
+  "search": "index=web_logs sourcetype=\"access_combined\" | rex field=uri_path \"\\/(?[a-zA-Z0-9_-]+)\\/(?\\d+)\" | where isnotnull(object_id) | stats dc(object_id) as unique_objects count by src_ip, user, endpoint | where unique_objects > 40 AND count > 60",
+  "cron_schedule": "*/5 * * * *",
+  "description": "Detects rapid enumeration of numerical object identifiers (IDOR)."
+}
