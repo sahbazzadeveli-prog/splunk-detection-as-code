@@ -1,0 +1,6 @@
+{
+  "name": "OWASP_A06_Log4j_JNDI_Exploit",
+  "search": "index=web_logs OR index=proxy | eval payload=urldecode(_raw) | regex payload=\"(?i)\\$\\{jndi:(ldap|rmi|dns|nis|nds|corba|iiop):\\/\\/\" | stats count values(http_user_agent) as user_agents values(payload) as payload_sample by src_ip, dest_ip, uri_path",
+  "cron_schedule": "*/5 * * * *",
+  "description": "OWASP A06: Log4j JNDI yukleri vasitesile RCE hucumlarini tespit eder."
+}
