@@ -1,0 +1,6 @@
+{
+  "name": "OWASP_A05_Sensitive_File_Access",
+  "search": "index=web_logs sourcetype=\"access_combined\" | regex uri_path=\"(?i)(\\.env|\\.git\\/|\\.htaccess|config\\.json|web\\.config|settings\\.py|database\\.yml|\\.aws\\/credentials|\\.ssh\\/)\" | stats count values(status) as http_statuses by src_ip, uri_path, http_user_agent | where http_statuses=200 OR http_statuses=304",
+  "cron_schedule": "*/5 * * * *",
+  "description": "OWASP A05: .env, .git kimi kritik konfiqurasiya fayllarina ugurlu girisleri tespit eder."
+}
