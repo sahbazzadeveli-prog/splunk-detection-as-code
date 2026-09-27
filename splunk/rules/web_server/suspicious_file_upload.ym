@@ -1,0 +1,16 @@
+title: Suspicious File Upload Extension Attempt
+id: 22222222-3333-4444-5555-666666666665
+logsource:
+    category: webserver
+detection:
+    selection:
+        cs-method: 'POST'
+        c-uri|contains:
+            - '/uploads/'
+            - '/images/'
+        c-uri|endswith:
+            - '.php'
+            - '.jsp'
+            - '.exe'
+    condition: selection
+level: high
