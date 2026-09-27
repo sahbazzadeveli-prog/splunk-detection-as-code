@@ -1,0 +1,13 @@
+title: SQL Injection Payload in URI
+id: 22222222-3333-4444-5555-666666666663
+logsource:
+    category: webserver
+detection:
+    selection:
+        c-uri|contains:
+            - 'UNION SELECT'
+            - '1=1'
+            - 'WAITFOR DELAY'
+            - 'information_schema'
+    condition: selection
+level: high
