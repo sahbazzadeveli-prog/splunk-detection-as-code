@@ -12,13 +12,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Send Rule to Splunk REST API
-        run: |
-          echo "Splunk REST API vasitəsilə alert yaradılır..."
-          
-          curl -k -u "\({{ secrets.SPLUNK_USER }}:\){{ secrets.SPLUNK_PASSWORD }}" \
-            https://\({{ secrets.SPLUNK_HOST }}:\){{ secrets.SPLUNK_PORT }}/servicesNS/nobody/search/saved/searches \
-            -d name="OWASP_OS_Command_Injection" \
-            -d search="index=* | eval decoded_uri=urldecode(uri) | rex field=decoded_uri \"(?whoami|id|cat)\" | where isnotnull(os_command)" \
-            -d is_scheduled=1 \
-            -d cron_schedule="*/5 * * * *"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Deploy rules to Splunk via REST API
+        env:
+          SPLUNK_HOST: ${{ secrets.SPLUNK_HOST }}
+          SPLUNK_PORT: ${{ secrets.SPLUNK_PORT }}
+          SPLUNK_TOKEN: ${{ secrets.SPLUNK_TOKEN }}
+          TELEGRAM_BOT_ID: ${{ secrets.TELEGRAM_BOT_ID }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python splunk/deploy_splunk.py
