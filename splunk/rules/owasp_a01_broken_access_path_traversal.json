@@ -1,6 +1,0 @@
-{
-  "name": "OWASP_A01_Path_Traversal_Attempt",
-  "search": "index=web_logs sourcetype=\"access_combined\" OR sourcetype=\"nginx:plus:access\" | eval uri_decoded=urldecode(uri_path), uri_query_decoded=urldecode(_raw) | regex uri_decoded=\"(?i)(\\.\\.\\/|\\.\\.\\\\|%2e%2e%2f|%2e%2e\\/|%2e%2e%5c|%252e%252e)\" | stats count min(_time) as first_seen max(_time) as last_seen values(uri_path) as targeted_paths by src_ip, http_user_agent, status | where count >= 3",
-  "cron_schedule": "*/5 * * * *",
-  "description": "OWASP A01: Path traversal ve kataloq gezinme hucum cehdlerini tespit eder."
-}
