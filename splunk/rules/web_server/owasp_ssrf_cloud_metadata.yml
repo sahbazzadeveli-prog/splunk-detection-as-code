@@ -1,12 +1,24 @@
-title: OWASP - SSRF Attempt (Cloud Metadata Query)
+title: OWASP - SSRF Attempt (Cloud Metadata / Localhost Query)
 id: 55555555-6666-7777-8888-999999999992
 logsource:
     category: webserver
 detection:
-    selection:
+    selection_uri:
         c-uri|contains:
             - '169.254.169.254'
             - 'metadata.google.internal'
             - '/latest/meta-data/'
-    condition: selection
+            - '127.0.0.1'
+            - 'localhost'
+            - '0.0.0.0'
+            - '::1'
+    selection_username:
+        username|contains:
+            - '169.254.169.254'
+            - 'metadata.google.internal'
+            - '127.0.0.1'
+            - 'localhost'
+            - '0.0.0.0'
+            - '::1'
+    condition: selection_uri or selection_username
 level: high
