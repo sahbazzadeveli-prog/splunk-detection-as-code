@@ -19,6 +19,8 @@ headers = {
 
 rule_files = glob.glob("splunk/rules/**/*.yml", recursive=True)
 
+SEVERITY_MAP = {"low": "2", "medium": "3", "high": "4", "critical": "5"}
+
 
 def render_value(real_field, value, modifier):
     if modifier == "contains":
@@ -83,6 +85,7 @@ for file_path in rule_files:
     base_url = f"https://{splunk_host}:{splunk_port}/servicesNS/{owner}/{app}/saved/searches"
     check_url = f"https://{splunk_host}:{splunk_port}/servicesNS/-/-/saved/searches/{safe_rule_name}?output_mode=json"
 
+    # --- DÜZƏLİŞ: doğru REST API alert parametrləri ---
     payload = {
         "name": safe_rule_name,
         "search": spl_search,
@@ -90,11 +93,14 @@ for file_path in rule_files:
         "is_scheduled": "1",
         "disabled": "0",
         "description": description,
-        "counttype": "number of events",
-        "relation": "greater than",
-        "quantity": "0",
+        "alert_type": "number of events",
+        "alert_comparator": "greater than",
+        "alert_threshold": "0",
         "alert.track": "1",
+        "alert.suppress": "0",
+        "alert.severity": SEVERITY_MAP.get(level, "3"),
     }
+    # --- DÜZƏLİŞ SONU ---
 
     if TELEGRAM_BOT_ID and TELEGRAM_CHAT_ID:
         payload.update({
