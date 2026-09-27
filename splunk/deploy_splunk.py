@@ -106,12 +106,20 @@ for file_path in rule_files:
             "action.telegram.param.message": f"Alert triggered: {rule_name} - {description}",
         })
 
-    check_response = requests.get(check_url, headers=headers, verify=False)
+    check_response = requests.get(check_url, headers=headers, params={"output_mode": "json"}, verify=False)
 
     if check_response.status_code == 200:
-        response = requests.post(check_url, headers=headers, data=payload, verify=False)
+        try:
+            entry = check_response.json()["entry"][0]
+            real_owner = entry["acl"]["owner"]
+            real_app = entry["acl"]["app"]
+        except (KeyError, IndexError, ValueError):
+            real_owner, real_app = owner, app
+
+        real_update_url = f"https://{splunk_host}:{splunk_port}/servicesNS/{real_owner}/{real_app}/saved/searches/{safe_rule_name}?output_mode=json"
+        response = requests.post(real_update_url, headers=headers, data=payload, verify=False)
         if response.status_code in [200, 201]:
-            print(f"[SUCCESS] Qayda yeniləndi: {safe_rule_name}")
+            print(f"[SUCCESS] Qayda yeniləndi: {safe_rule_name} (owner={real_owner}, app={real_app})")
         else:
             print(f"[ERROR] {safe_rule_name} yenilənə bilmədi: {response.status_code} - {response.text[:300]}")
     else:
