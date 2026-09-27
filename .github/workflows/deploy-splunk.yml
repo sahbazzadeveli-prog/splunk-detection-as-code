@@ -19,7 +19,7 @@ jobs:
           SPLUNK_USER: ${{ secrets.SPLUNK_USER }}
           SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
         run: |
-          echo "Splunk REST API vasitəsilə alert yaradılır..."
+          echo "Yoxlanılır: Host=\(SPLUNK_HOST, Port=\)SPLUNK_PORT"
           
           curl -k -u "\(SPLUNK_USER:\)SPLUNK_PASSWORD" \
             https://\(SPLUNK_HOST:\)SPLUNK_PORT/servicesNS/nobody/search/saved/searches \
