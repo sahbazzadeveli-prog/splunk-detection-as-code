@@ -1,0 +1,12 @@
+title: Kerberoasting Attack Attempt (RC4 Ticket Request)
+id: 11111111-2222-3333-4444-555555555553
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4769
+        TicketOptions: '0x40810000'
+        TicketEncryptionType: '0x17' # RC4
+    condition: selection
+level: high
