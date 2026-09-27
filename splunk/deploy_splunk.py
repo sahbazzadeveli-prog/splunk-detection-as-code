@@ -3,6 +3,7 @@ import glob
 import yaml
 import requests
 import urllib3
+from urllib.parse import quote
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -72,6 +73,7 @@ for file_path in rule_files:
 
     rule_name = rule.get("title", "Unnamed Sigma Rule")
     safe_rule_name = rule_name.replace(" ", "_").replace("-", "_")
+    encoded_rule_name = quote(safe_rule_name, safe="")
     description = rule.get("description", "")
     level = rule.get("level", "medium")
 
@@ -83,9 +85,8 @@ for file_path in rule_files:
     owner = "nobody"
     app = "search"
     base_url = f"https://{splunk_host}:{splunk_port}/servicesNS/{owner}/{app}/saved/searches"
-    check_url = f"https://{splunk_host}:{splunk_port}/servicesNS/-/-/saved/searches/{safe_rule_name}?output_mode=json"
+    check_url = f"https://{splunk_host}:{splunk_port}/servicesNS/-/-/saved/searches/{encoded_rule_name}?output_mode=json"
 
-    # --- DÜZƏLİŞ: doğru REST API alert parametrləri ---
     payload = {
         "name": safe_rule_name,
         "search": spl_search,
@@ -100,7 +101,6 @@ for file_path in rule_files:
         "alert.suppress": "0",
         "alert.severity": SEVERITY_MAP.get(level, "3"),
     }
-    # --- DÜZƏLİŞ SONU ---
 
     if TELEGRAM_BOT_ID and TELEGRAM_CHAT_ID:
         payload.update({
@@ -123,7 +123,7 @@ for file_path in rule_files:
         except (KeyError, IndexError, ValueError):
             real_owner, real_app = owner, app
 
-        real_update_url = f"https://{splunk_host}:{splunk_port}/servicesNS/{real_owner}/{real_app}/saved/searches/{safe_rule_name}?output_mode=json"
+        real_update_url = f"https://{splunk_host}:{splunk_port}/servicesNS/{real_owner}/{real_app}/saved/searches/{encoded_rule_name}?output_mode=json"
         response = requests.post(real_update_url, headers=headers, data=payload, verify=False)
         if response.status_code in [200, 201]:
             print(f"[SUCCESS] Qayda yeniləndi: {safe_rule_name} (owner={real_owner}, app={real_app})")
