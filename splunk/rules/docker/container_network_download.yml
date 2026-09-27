@@ -1,0 +1,15 @@
+title: Suspicious Network Download Inside Container
+id: 33333333-4444-5555-6666-777777777774
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    selection:
+        Image|endswith:
+            - '/wget'
+            - '/curl'
+        ParentImage|contains:
+            - 'containerd'
+            - 'dockerd'
+    condition: selection
+level: high
