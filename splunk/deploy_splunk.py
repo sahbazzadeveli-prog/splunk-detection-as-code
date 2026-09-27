@@ -117,6 +117,8 @@ for file_path in rule_files:
         "name": safe_rule_name,
         "search": spl_search,
         "cron_schedule": "*/5 * * * *",
+        "dispatch.earliest_time": "-6m",
+        "dispatch.latest_time": "now",
         "is_scheduled": "1",
         "disabled": "0",
         "description": description,
