@@ -1,0 +1,12 @@
+title: Pass the Hash Activity
+id: 11111111-2222-3333-4444-555555555554
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4624
+        LogonType: 9
+        AuthenticationPackageName: 'Negotiate'
+    condition: selection
+level: high
