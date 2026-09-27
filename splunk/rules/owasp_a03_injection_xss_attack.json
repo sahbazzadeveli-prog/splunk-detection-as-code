@@ -1,6 +1,0 @@
-{
-  "name": "OWASP_A03_XSS_Attack_Pattern",
-  "search": "index=web_logs sourcetype=\"access_combined\" | eval decoded_payload=urldecode(_raw) | regex decoded_payload=\"(?i)(]*>|javascript\\s*:|onerror\\s*=|onload\\s*=|eval\\(|document\\.cookie|window\\.location|alert\\(|confirm\\(|]*>)\" | stats count values(uri_path) as targeted_urls by src_ip, status, http_user_agent",
-  "cron_schedule": "*/5 * * * *",
-  "description": "OWASP A03: Reflected ve Stored XSS hucum strukturlarini tespit eder."
-}
