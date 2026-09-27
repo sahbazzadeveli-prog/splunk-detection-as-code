@@ -2,14 +2,29 @@ title: OWASP - OS Command Injection Attempt via URI
 id: 55555555-6666-7777-8888-999999999991
 logsource:
     category: webserver
+    product: web_api
 detection:
-    selection:
-        c-uri|contains:
+    selection_path:
+        path|contains:
             - ';id'
             - '|whoami'
             - '`whoami`'
             - ';uname -a'
             - '/bin/bash'
             - 'cmd.exe /c'
-    condition: selection
+            - '&& whoami'
+            - '| cat /etc/passwd'
+            - '; cat /etc/passwd'
+            - '$(whoami)'
+            - 'powershell -e'
+            - 'nc -e'
+    selection_username:
+        username|contains:
+            - '|whoami'
+            - ';id'
+            - '`whoami`'
+            - '$(whoami)'
+            - '&& whoami'
+            - '; cat /etc/passwd'
+    condition: selection_path or selection_username
 level: critical
