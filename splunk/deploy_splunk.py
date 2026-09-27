@@ -106,7 +106,7 @@ for file_path in rule_files:
             "action.telegram.param.message": f"Alert triggered: {rule_name} - {description}",
         })
 
-    check_response = requests.get(check_url, headers=headers, params={"output_mode": "json"}, verify=False)
+    check_response = requests.get(check_url, headers=headers, verify=False)
 
     if check_response.status_code == 200:
         try:
