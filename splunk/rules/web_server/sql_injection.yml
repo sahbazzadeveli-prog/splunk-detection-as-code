@@ -4,11 +4,29 @@ logsource:
     category: webserver
     product: web_api
 detection:
-    selection:
+    selection_path:
         path|contains:
             - 'UNION SELECT'
+            - 'UNION ALL SELECT'
             - '1=1'
+            - "1'='1"
             - 'WAITFOR DELAY'
             - 'information_schema'
-    condition: selection
+            - 'sleep('
+            - 'benchmark('
+            - 'xp_cmdshell'
+            - '--'
+            - '/*'
+            - "'="
+    selection_username:
+        username|contains:
+            - 'UNION SELECT'
+            - '1=1'
+            - "' --"
+            - "'--"
+            - "' OR '1'='1"
+            - "admin'--"
+            - "' OR 1=1"
+            - 'DROP TABLE'
+    condition: selection_path or selection_username
 level: high
