@@ -90,9 +90,10 @@ for file_path in rule_files:
         "is_scheduled": "1",
         "disabled": "0",
         "description": description,
-        "alert_type": "number of events",
-        "alert_comparator": "greater than",
-        "alert_threshold": "0",
+        "counttype": "number of events",
+        "relation": "greater than",
+        "quantity": "0",
+        "alert.track": "1",
     }
 
     if TELEGRAM_BOT_ID and TELEGRAM_CHAT_ID:
