@@ -1,0 +1,13 @@
+title: Privileged Docker Container Spawn
+id: 33333333-4444-5555-6666-777777777771
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    selection:
+        CommandLine|contains:
+            - 'docker run'
+        CommandLine|contains_all:
+            - '--privileged'
+    condition: selection
+level: high
