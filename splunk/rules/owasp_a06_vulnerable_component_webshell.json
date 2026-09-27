@@ -1,6 +1,0 @@
-{
-  "name": "OWASP_A06_Webshell_Execution",
-  "search": "index=sysmon EventCode=1 (Image=\"*\\\\cmd.exe\" OR Image=\"*\\\\powershell.exe\" OR Image=\"*/bin/bash\" OR Image=\"*/bin/sh\") (ParentImage=\"*\\\\w3wp.exe\" OR ParentImage=\"*\\\\httpd*\" OR ParentImage=\"*\\\\nginx*\" OR ParentImage=\"*\\\\tomcat*\") | stats count values(CommandLine) as spawned_commands by host, ParentImage, Image, User",
-  "cron_schedule": "*/5 * * * *",
-  "description": "OWASP A06: Web server prosesleri terafinden emr emeliyyatlarinin (Webshell) basladilmasini tespit eder."
-}
