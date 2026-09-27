@@ -1,6 +1,0 @@
-{
-  "name": "OWASP_A08_Java_PHP_Deserialization",
-  "search": "index=web_logs sourcetype=\"access_combined\" | eval raw_payload=urldecode(_raw) | regex raw_payload=\"(?i)(rO0ABX|K3BocA|O:\\d+:\"[a-zA-Z0-9_]+\":\\d+:|java\\.lang\\.Runtime|org\\.apache\\.commons\\.collections)\" | stats count values(uri_path) as targeted_uris by src_ip, status",
-  "cron_schedule": "*/5 * * * *",
-  "description": "OWASP A08: Tehlukeli Java/PHP obyekt deserialization yuklerini tespit eder."
-}
