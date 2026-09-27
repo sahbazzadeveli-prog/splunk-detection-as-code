@@ -123,8 +123,9 @@ for file_path in rule_files:
         except (KeyError, IndexError, ValueError):
             real_owner, real_app = owner, app
 
+        update_payload = {k: v for k, v in payload.items() if k != "name"}
         real_update_url = f"https://{splunk_host}:{splunk_port}/servicesNS/{real_owner}/{real_app}/saved/searches/{encoded_rule_name}?output_mode=json"
-        response = requests.post(real_update_url, headers=headers, data=payload, verify=False)
+        response = requests.post(real_update_url, headers=headers, data=update_payload, verify=False)
         if response.status_code in [200, 201]:
             print(f"[SUCCESS] Qayda yeniləndi: {safe_rule_name} (owner={real_owner}, app={real_app})")
         else:
