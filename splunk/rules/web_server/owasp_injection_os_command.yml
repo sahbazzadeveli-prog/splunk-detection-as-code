@@ -8,6 +8,7 @@ detection:
         path|contains:
             - ';id'
             - '|whoami'
+            - '| whoami'
             - '`whoami`'
             - ';uname -a'
             - '/bin/bash'
@@ -20,11 +21,14 @@ detection:
             - 'nc -e'
     selection_username:
         username|contains:
-            - '|whoami'
+            - 'whoami'
             - ';id'
             - '`whoami`'
             - '$(whoami)'
             - '&& whoami'
             - '; cat /etc/passwd'
+            - '| cat /etc/passwd'
+            - '/bin/bash'
+            - 'cmd.exe'
     condition: selection_path or selection_username
 level: critical
