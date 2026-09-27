@@ -1,0 +1,16 @@
+title: Interactive Shell Executed in Running Container
+id: 33333333-4444-5555-6666-777777777773
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    selection:
+        CommandLine|contains:
+            - 'docker exec'
+            - 'kubectl exec'
+        CommandLine|contains_all:
+            - '-i'
+            - '-t'
+            - 'bash' # or sh
+    condition: selection
+level: medium
