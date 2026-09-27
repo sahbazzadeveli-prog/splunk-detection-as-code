@@ -1,0 +1,19 @@
+title: Suspicious Process Spawning by Web Server (Web Shell)
+id: 22222222-3333-4444-5555-666666666661
+logsource:
+    category: process_creation
+    product: windows # or linux
+detection:
+    selection:
+        ParentImage|endswith:
+            - '\w3wp.exe'
+            - '\httpd.exe'
+            - '/nginx'
+            - '/apache2'
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+            - '/bash'
+            - '/sh'
+    condition: selection
+level: critical
