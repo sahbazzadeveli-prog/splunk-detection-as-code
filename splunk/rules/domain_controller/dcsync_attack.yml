@@ -1,0 +1,13 @@
+title: DCSync Attack Attempt
+id: 11111111-2222-3333-4444-555555555551
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4662
+        Properties|contains:
+            - '1131f6aa-9c07-11d1-f79f-00c04fc2dcd2' # DS-Replication-Get-Changes
+            - '1131f6ad-9c07-11d1-f79f-00c04fc2dcd2' # DS-Replication-Get-Changes-All
+    condition: selection
+level: high
