@@ -35,33 +35,59 @@ def render_value(real_field, value, modifier):
     return f'{real_field}="{pattern}"'
 
 
-def build_spl_from_sigma(rule):
-    detection = rule.get("detection", {})
-    selection = detection.get("selection", {})
-    logsource = rule.get("logsource", {})
-
-    conditions = []
-
-    product = logsource.get("product", "")
-    if product:
-        conditions.append(f'index="{product}"')
-
-    for field, value in selection.items():
+def build_selection_spl(selection_block):
+    terms = []
+    for field, value in selection_block.items():
         if "|" in field:
             real_field, modifier = field.split("|", 1)
         else:
             real_field, modifier = field, None
 
         if isinstance(value, list):
-            terms = " OR ".join([render_value(real_field, v, modifier) for v in value])
-            conditions.append(f"({terms})")
+            or_terms = " OR ".join([render_value(real_field, v, modifier) for v in value])
+            terms.append(f"({or_terms})")
         else:
-            conditions.append(render_value(real_field, value, modifier))
+            terms.append(render_value(real_field, value, modifier))
+    return " ".join(terms)
 
-    if not conditions:
+
+def build_spl_from_sigma(rule):
+    detection = rule.get("detection", {})
+    logsource = rule.get("logsource", {})
+    condition = detection.get("condition", "selection")
+
+    index_prefix = ""
+    product = logsource.get("product", "")
+    if product:
+        index_prefix = f'index="{product}" '
+
+    selection_blocks = {
+        key: value for key, value in detection.items() if key != "condition"
+    }
+
+    if not selection_blocks:
         return None
 
-    return " ".join(conditions)
+    if len(selection_blocks) == 1:
+        only_block = next(iter(selection_blocks.values()))
+        block_spl = build_selection_spl(only_block)
+        return f"{index_prefix}{block_spl}" if block_spl else None
+
+    rendered_blocks = {
+        name: build_selection_spl(block) for name, block in selection_blocks.items()
+    }
+
+    condition_lower = condition.lower()
+    if " or " in condition_lower:
+        joiner = " OR "
+    else:
+        joiner = " AND "
+
+    combined = joiner.join([f"({spl})" for spl in rendered_blocks.values() if spl])
+    if not combined:
+        return None
+
+    return f"{index_prefix}({combined})"
 
 
 for file_path in rule_files:
