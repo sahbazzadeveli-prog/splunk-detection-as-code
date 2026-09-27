@@ -1,6 +1,0 @@
-{
-  "name": "OWASP_A01_Unauthorized_Admin_Access",
-  "search": "index=web_logs (uri_path=\"*/admin/*\" OR uri_path=\"*/dashboard/*\" OR uri_path=\"*/manage/*\") | eval user=if(isnull(user) OR user=\"\", \"ANONYMOUS\", user) | stats count values(status) as http_status_codes values(uri_path) as visited_endpoints by src_ip, user | where (http_status_codes=200 OR http_status_codes=302) AND user=\"ANONYMOUS\"",
-  "cron_schedule": "*/5 * * * *",
-  "description": "OWASP A01: Autentifikasiya olunmamis istifadecilerin admin panellerine girisini tespit eder."
-}
