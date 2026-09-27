@@ -1,26 +1,29 @@
-name: Deploy Splunk Rules via REST API
+name: Deploy Rules to Splunk
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - 'splunk/**'
+    branches:
+      - main
 
 jobs:
-  deploy-splunk:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install requests PyYAML
-      - name: Execute Splunk Deployment
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Send Rule to Splunk REST API
         env:
           SPLUNK_HOST: ${{ secrets.SPLUNK_HOST }}
           SPLUNK_PORT: ${{ secrets.SPLUNK_PORT }}
-          SPLUNK_TOKEN: ${{ secrets.SPLUNK_TOKEN }}
-        run: python3 splunk/deploy_splunk.py
+          SPLUNK_USER: ${{ secrets.SPLUNK_USER }}
+          SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
+        run: |
+          echo "Splunk REST API vasitəsilə alert yaradılır..."
+          
+          curl -k -u "\(SPLUNK_USER:\)SPLUNK_PASSWORD" \
+            https://\(SPLUNK_HOST:\)SPLUNK_PORT/servicesNS/nobody/search/saved/searches \
+            -d name="OWASP_OS_Command_Injection" \
+            -d search="index=* | eval decoded_uri=urldecode(uri) | rex field=decoded_uri \"(?whoami|id|cat)\" | where isnotnull(os_command)" \
+            -d is_scheduled=1 \
+            -d cron_schedule="*/5 * * * *"
