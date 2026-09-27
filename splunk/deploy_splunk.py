@@ -142,12 +142,9 @@ for file_path in rule_files:
     check_response = requests.get(check_url, headers=headers, verify=False)
 
     if check_response.status_code == 200:
-        try:
-            entry = check_response.json()["entry"][0]
-            real_owner = entry["acl"]["owner"]
-            real_app = entry["acl"]["app"]
-        except (KeyError, IndexError, ValueError):
-            real_owner, real_app = owner, app
+        # Qlobal/paylaşılan (nobody) namespace-i məcburi işlədirik ki,
+        # istifadəçiyə xas gizli surət yaranmasın
+        real_owner, real_app = "nobody", "search"
 
         update_payload = {k: v for k, v in payload.items() if k != "name"}
         real_update_url = f"https://{splunk_host}:{splunk_port}/servicesNS/{real_owner}/{real_app}/saved/searches/{encoded_rule_name}?output_mode=json"
