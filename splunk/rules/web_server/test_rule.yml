@@ -1,0 +1,19 @@
+title: Test Sigma Rule For GitHub Actions Verification
+id: 99999999-8888-7777-6666-555555555555
+status: experimental
+description: Simple test rule to verify GitHub Actions deployment workflow.
+author: Security Engineer
+date: 2026/09/27
+tags:
+    - attack.execution
+logsource:
+    product: windows
+    service: powershell
+detection:
+    selection:
+        ScriptBlockText|contains:
+            - 'Test-Pipeline-Verification'
+    condition: selection
+falsepositives:
+    - None
+level: low
