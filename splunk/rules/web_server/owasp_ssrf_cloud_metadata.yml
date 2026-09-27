@@ -1,0 +1,12 @@
+title: OWASP - SSRF Attempt (Cloud Metadata Query)
+id: 55555555-6666-7777-8888-999999999992
+logsource:
+    category: webserver
+detection:
+    selection:
+        c-uri|contains:
+            - '169.254.169.254'
+            - 'metadata.google.internal'
+            - '/latest/meta-data/'
+    condition: selection
+level: high
