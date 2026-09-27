@@ -13,16 +13,11 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Send Rule to Splunk REST API
-        env:
-          SPLUNK_HOST: ${{ secrets.SPLUNK_HOST }}
-          SPLUNK_PORT: ${{ secrets.SPLUNK_PORT }}
-          SPLUNK_USER: ${{ secrets.SPLUNK_USER }}
-          SPLUNK_PASSWORD: ${{ secrets.SPLUNK_PASSWORD }}
         run: |
-          echo "Yoxlanılır: Host=\(SPLUNK_HOST, Port=\)SPLUNK_PORT"
+          echo "Splunk REST API vasitəsilə alert yaradılır..."
           
-          curl -k -u "\(SPLUNK_USER:\)SPLUNK_PASSWORD" \
-            https://\(SPLUNK_HOST:\)SPLUNK_PORT/servicesNS/nobody/search/saved/searches \
+          curl -k -u "\({{ secrets.SPLUNK_USER }}:\){{ secrets.SPLUNK_PASSWORD }}" \
+            https://\({{ secrets.SPLUNK_HOST }}:\){{ secrets.SPLUNK_PORT }}/servicesNS/nobody/search/saved/searches \
             -d name="OWASP_OS_Command_Injection" \
             -d search="index=* | eval decoded_uri=urldecode(uri) | rex field=decoded_uri \"(?whoami|id|cat)\" | where isnotnull(os_command)" \
             -d is_scheduled=1 \
