@@ -21,12 +21,26 @@ headers = {
 rule_files = glob.glob("splunk/rules/**/*.yml", recursive=True)
 
 
+def render_value(real_field, value, modifier):
+    """Bir sahə üçün SPL şərti qurur, Sigma modifikatoruna görə wildcard yerləşdirir."""
+    if modifier == "contains":
+        pattern = f"*{value}*"
+    elif modifier == "startswith":
+        pattern = f"{value}*"
+    elif modifier == "endswith":
+        pattern = f"*{value}"
+    else:
+        pattern = f"{value}"
+    return f'{real_field}="{pattern}"'
+
+
 def build_spl_from_sigma(rule):
     """
-    Sigma 'detection' blokunu sadə SPL-ə çevirir.
-    Yalnız 'selection' altında birbaşa sahə=deyer və 'contains' şərtlərini dəstəkləyir.
-    Mürəkkəb Sigma qaydaları üçün pySigma/sigma-cli istifadə etmək daha düzgündür,
-    amma bu, sizin cari rule formatınız üçün kifayətdir.
+    Sigma 'detection' blokunu SPL-ə çevirir.
+    'selection' altında sahə adları modifikator daşıya bilər: field, field|contains,
+    field|startswith, field|endswith. Hamısı düzgün SPL wildcard sintaksisinə çevrilir
+    (pipe işarəsi SPL əmr ayırıcısı ilə qarışmasın deyə, modifikator SPL-ə YAZILMIR,
+    yalnız dəyərin özünə wildcard əlavə olunur).
     """
     detection = rule.get("detection", {})
     selection = detection.get("selection", {})
@@ -34,29 +48,23 @@ def build_spl_from_sigma(rule):
 
     conditions = []
 
-    # logsource-dan index/sourcetype təxmin et (öz mühitinə uyğun dəyişdir)
     product = logsource.get("product", "")
-    service = logsource.get("service", "")
     if product:
         conditions.append(f'index="{product}"')
 
     for field, value in selection.items():
-        if "|contains" in field:
-            real_field = field.split("|")[0]
-            if isinstance(value, list):
-                terms = " OR ".join([f'{real_field}="*{v}*"' for v in value])
-                conditions.append(f"({terms})")
-            else:
-                conditions.append(f'{real_field}="*{value}*"')
+        if "|" in field:
+            real_field, modifier = field.split("|", 1)
         else:
-            if isinstance(value, list):
-                terms = " OR ".join([f'{field}="{v}"' for v in value])
-                conditions.append(f"({terms})")
-            else:
-                conditions.append(f'{field}="{value}"')
+            real_field, modifier = field, None
+
+        if isinstance(value, list):
+            terms = " OR ".join([render_value(real_field, v, modifier) for v in value])
+            conditions.append(f"({terms})")
+        else:
+            conditions.append(render_value(real_field, value, modifier))
 
     if not conditions:
-        # heç bir şərt tapılmasa, boş saved search yaratmaqdansa xəbərdarlıq ver
         return None
 
     return " ".join(conditions)
@@ -79,7 +87,11 @@ for file_path in rule_files:
         print(f"[SKIP] {file_path} üçün SPL qurula bilmədi (detection boşdur)")
         continue
 
-    url = f"https://{splunk_host}:{splunk_port}/servicesNS/nobody/search/saved/searches/{safe_rule_name}?output_mode=json"
+    # NOT: "nobody" əvəzinə konkret owner ("admin") istifadə olunur ki, update və create
+    # eyni namespace-ə düşsün - əks halda hər push-da "already exists" konflikti yaranır.
+    owner = "admin"
+    app = "search"
+    url = f"https://{splunk_host}:{splunk_port}/servicesNS/{owner}/{app}/saved/searches/{safe_rule_name}?output_mode=json"
 
     payload = {
         "name": safe_rule_name,
@@ -111,7 +123,8 @@ for file_path in rule_files:
     if response.status_code in [200, 201]:
         print(f"[SUCCESS] Qayda yeniləndi: {safe_rule_name}")
     else:
-        create_url = f"https://{splunk_host}:{splunk_port}/servicesNS/nobody/search/saved/searches?output_mode=json"
+        print(f"[INFO] Update alınmadı ({response.status_code}), yaratmağa cəhd olunur: {response.text[:200]}")
+        create_url = f"https://{splunk_host}:{splunk_port}/servicesNS/{owner}/{app}/saved/searches?output_mode=json"
         res_create = requests.post(create_url, headers=headers, data=payload, verify=False)
         if res_create.status_code in [200, 201]:
             print(f"[CREATED] Yeni qayda yaradıldı: {safe_rule_name}")
