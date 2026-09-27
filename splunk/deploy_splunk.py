@@ -81,7 +81,7 @@ for file_path in rule_files:
     owner = "nobody"
     app = "search"
     base_url = f"https://{splunk_host}:{splunk_port}/servicesNS/{owner}/{app}/saved/searches"
-    check_url = f"{base_url}/{safe_rule_name}?output_mode=json"
+    check_url = f"https://{splunk_host}:{splunk_port}/servicesNS/-/-/saved/searches/{safe_rule_name}?output_mode=json"
 
     payload = {
         "name": safe_rule_name,
@@ -123,6 +123,7 @@ for file_path in rule_files:
         else:
             print(f"[ERROR] {safe_rule_name} yenilənə bilmədi: {response.status_code} - {response.text[:300]}")
     else:
+        print(f"[DEBUG] {safe_rule_name} üçün GET check {check_response.status_code} qaytardı: {check_response.text[:200]}")
         response = requests.post(f"{base_url}?output_mode=json", headers=headers, data=payload, verify=False)
         if response.status_code in [200, 201]:
             print(f"[CREATED] Yeni qayda yaradıldı: {safe_rule_name}")
