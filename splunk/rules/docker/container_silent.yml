@@ -1,0 +1,39 @@
+name: Docker - Container Silent (No Logs)
+description: >
+  Bir container son 10 deqiqedir Splunk-a log gondermirse alert yaradir.
+  Container dusub ve ya logging pozulub demekdir.
+severity: high
+enabled: true
+
+schedule:
+  cron: "*/5 * * * *"
+  earliest: "-1h"
+  latest: "now"
+
+search: |
+  index=docker sourcetype="docker:web" earliest=-1h
+  | spath input=_raw path=tag output=container_tag
+  | stats latest(_time) AS last_log BY container_tag host
+  | eval minutes_silent=round((now()-last_log)/60,0)
+  | where minutes_silent>=10
+  | eval last_log=strftime(last_log, "%Y-%m-%d %H:%M:%S")
+  | table host container_tag minutes_silent last_log
+
+alert:
+  condition: "number of results > 0"
+  throttle:
+    period: 30m
+    fields: [host, container_tag]
+
+notification:
+  telegram:
+    message: |
+      🚨 *Docker Alert: Container Silent*
+      *Host:* {{host}}
+      *Container:* {{container_tag}}
+      *Susma muddeti (deq):* {{minutes_silent}}
+      *Son log:* {{last_log}}
+
+tags:
+  - docker
+  - availability
