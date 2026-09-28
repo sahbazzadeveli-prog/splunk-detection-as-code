@@ -1,0 +1,18 @@
+title: XXE XML External Entity Injection Attempt
+id: 4d8f2a61-9c37-4e15-b6a0-3f7e1d5c9b82
+logsource:
+    product: docker
+    category: container_logs
+detection:
+    selection:
+        line|contains:
+            - '<!ENTITY'
+            - '<!DOCTYPE'
+            - 'SYSTEM "file:'
+            - 'SYSTEM "http'
+            - '%3C!ENTITY'
+            - '%3C!DOCTYPE'
+            - 'expect://'
+            - 'php://filter'
+    condition: selection
+level: high
