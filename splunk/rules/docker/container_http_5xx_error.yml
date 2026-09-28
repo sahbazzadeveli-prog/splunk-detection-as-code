@@ -1,0 +1,14 @@
+title: Docker Container HTTP 5xx Server Error
+id: 3b8e6f14-52a7-4d1c-9e40-a6c1d7f92b58
+logsource:
+    product: docker
+    category: container_logs
+detection:
+    selection:
+        line|contains:
+            - '" 500 '
+            - '" 502 '
+            - '" 503 '
+            - '" 504 '
+    condition: selection
+level: high
