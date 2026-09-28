@@ -1,0 +1,17 @@
+title: Docker Container Reverse Shell Attempt
+id: 8d2c4a71-6f13-4b5e-a9d0-1e7b3c5f8a24
+logsource:
+    product: docker
+    category: container_logs
+detection:
+    selection:
+        line|contains:
+            - 'bash -i'
+            - '/dev/tcp/'
+            - 'nc -e'
+            - 'ncat -e'
+            - 'mkfifo /tmp'
+            - 'python -c import socket'
+            - 'sh -i >&'
+    condition: selection
+level: critical
