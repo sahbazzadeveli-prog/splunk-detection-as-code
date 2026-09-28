@@ -1,0 +1,23 @@
+title: XDR Incident with Ingress Tool Transfer Technique (T1105)
+id: 33333333-4444-5555-6666-777777777773
+status: stable
+description: Detects a new XDR incident mapped to MITRE ATT&CK technique T1105 (Ingress Tool Transfer). Indicates an attacker or malware downloading additional tools or payloads onto a protected endpoint.
+references:
+    - https://attack.mitre.org/techniques/T1105/
+author: Veli Shahbazzada
+date: 2026/09/28
+tags:
+    - attack.command_and_control
+    - attack.t1105
+logsource:
+    category: endpoint
+    product: xdr
+detection:
+    selection:
+        module: 'new-incident'
+        att_ck_id{}: 'T1105'
+    condition: selection
+falsepositives:
+    - Legitimate software updates or administrators downloading tools
+    - Security testing with EICAR download URLs
+level: high
