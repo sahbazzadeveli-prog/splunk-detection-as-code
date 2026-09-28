@@ -1,14 +1,13 @@
 title: OWASP - Security Misconfiguration (Sensitive Host Mount)
 id: 66666666-7777-8888-9999-000000000001
 logsource:
-    product: linux
-    category: process_creation
+    product: docker
+    category: container_logs
 detection:
     selection:
-        CommandLine|contains:
-            - 'docker run'
-        CommandLine|contains_all:
-            - '-v '
-            - ':/etc' # or :/root, :/boot
+        line|contains:
+            - ':/etc'
+            - ':/root'
+            - ':/boot'
     condition: selection
 level: high
