@@ -1,0 +1,16 @@
+title: Docker Container Sensitive File Access Attempt
+id: 5e9a1c37-2b84-4d60-8f13-c7a2e4b9d605
+logsource:
+    product: docker
+    category: container_logs
+detection:
+    selection:
+        line|contains:
+            - '/etc/shadow'
+            - '/etc/passwd'
+            - '.ssh/id_rsa'
+            - '/proc/self/environ'
+            - '.aws/credentials'
+            - '.env'
+    condition: selection
+level: critical
