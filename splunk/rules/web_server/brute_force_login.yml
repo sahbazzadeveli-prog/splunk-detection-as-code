@@ -1,8 +1,8 @@
 title: Brute Force Login Attempts
 id: 7c1f3a52-9d84-4e6b-b3a1-2f5e8d90c417
 status: experimental
-description: Login endpoint-inə uğursuz cəhdlərin çoxluğu (brute force / credential stuffing).
-author: Veli Sahbazzade
+description: 5 deqiqede eyni IP-den 10+ ugursuz login cehdi (brute force).
+author: Sənin Adın
 date: 2026/09/28
 tags:
   - attack.credential_access
@@ -10,16 +10,17 @@ tags:
 logsource:
   category: webserver
 detection:
-  selection_path:
-    path|contains:
-      - '/login'
-      - '/signin'
-      - '/auth'
+  selection_event:
+    event: login_failed
   selection_status:
     status:
       - 401
       - 403
-  condition: selection_path and selection_status
+  condition: selection_event and selection_status
+threshold:
+  group_by: client_ip
+  span: 5m
+  count: 10
 falsepositives:
   - Parolunu unudan istifadəçilər
 level: high
