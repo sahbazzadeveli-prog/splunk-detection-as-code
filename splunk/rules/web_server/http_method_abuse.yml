@@ -11,10 +11,7 @@ tags:
     - attack.t1190
 logsource:
     category: web_server
-    product: 
-        - nginx
-        - apache
-        - iis
+    product: nginx
 detection:
     selection:
         http_method|insensitive:
