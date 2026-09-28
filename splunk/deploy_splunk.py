@@ -118,6 +118,35 @@ def build_spl_from_sigma(rule):
     return f"{index_prefix}({combined})"
 
 
+# ---- YENİ: threshold (aggregation) dəstəyi ----
+def build_threshold_spl(base_spl, rule):
+    """
+    YAML-də 'threshold' bloku varsa, SPL-ə stats+where aqreqasiyası əlavə edir.
+    Məsələn:
+      threshold:
+        group_by: client_ip
+        span: 5m
+        count: 10
+    -> ... | bucket _time span=5m | stats count by _time, client_ip | where count >= 10
+    """
+    threshold = rule.get("threshold", {})
+    if not threshold:
+        return base_spl
+
+    group_by = threshold.get("group_by", "client_ip")
+    span = threshold.get("span", "5m")
+    count = threshold.get("count", 10)
+
+    full_spl = (
+        f"{base_spl} "
+        f"| bucket _time span={span} "
+        f"| stats count by _time, {group_by} "
+        f"| where count >= {count}"
+    )
+    return full_spl
+# ---- YENİ hissə sona çatdı ----
+
+
 for file_path in rule_files:
     with open(file_path, "r", encoding="utf-8") as f:
         rule = yaml.safe_load(f)
@@ -135,6 +164,9 @@ for file_path in rule_files:
     if not spl_search:
         print(f"[SKIP] {file_path} üçün SPL qurula bilmədi (detection boşdur)")
         continue
+
+    # YENİ: threshold varsa SPL-ə əlavə et
+    spl_search = build_threshold_spl(spl_search, rule)
 
     print(f"[INFO] {safe_rule_name} SPL: {spl_search}")
 
