@@ -25,6 +25,12 @@ SEVERITY_MAP = {"low": "2", "medium": "3", "high": "4", "critical": "5"}
 # logsource.category -> Splunk index
 CATEGORY_INDEX_MAP = {
     "webserver": "web_api",
+    "container_logs": "docker",
+}
+
+# product -> sourcetype mapping
+PRODUCT_SOURCETYPE_MAP = {
+    "docker": "docker:web",
 }
 
 
@@ -59,11 +65,21 @@ def build_selection_spl(selection_block):
 def get_index_prefix(logsource):
     category = logsource.get("category", "")
     product = logsource.get("product", "")
+    
     if category in CATEGORY_INDEX_MAP:
-        return f'index="{CATEGORY_INDEX_MAP[category]}" '
-    if product:
-        return f'index="{product}" '
-    return ""
+        index = CATEGORY_INDEX_MAP[category]
+    elif product:
+        index = product
+    else:
+        return ""
+    
+    result = f'index="{index}"'
+    
+    if product in PRODUCT_SOURCETYPE_MAP:
+        sourcetype = PRODUCT_SOURCETYPE_MAP[product]
+        result += f' sourcetype="{sourcetype}"'
+    
+    return result + " "
 
 
 def build_spl_from_sigma(rule):
