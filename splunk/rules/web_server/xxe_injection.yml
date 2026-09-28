@@ -6,13 +6,9 @@ logsource:
 detection:
     selection:
         line|contains:
-            - '<!ENTITY'
-            - '<!DOCTYPE'
-            - 'SYSTEM "file:'
-            - 'SYSTEM "http'
-            - '%3C!ENTITY'
-            - '%3C!DOCTYPE'
-            - 'expect://'
+            - 'ENTITY'
+            - 'SYSTEM'
             - 'php://filter'
+            - 'expect://'
     condition: selection
 level: high
