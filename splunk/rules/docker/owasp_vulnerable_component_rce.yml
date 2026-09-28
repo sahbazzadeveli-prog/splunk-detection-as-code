@@ -1,18 +1,13 @@
 title: OWASP - Vulnerable Component Exploitation (Shell spawned by App)
 id: 66666666-7777-8888-9999-000000000002
 logsource:
-    product: linux
-    category: process_creation
+    product: docker
+    category: container_logs
 detection:
     selection:
-        ParentImage|endswith:
-            - '/java'
-            - '/node'
-            - '/python'
-            - '/ruby'
-        Image|endswith:
-            - '/bash'
-            - '/sh'
-            - '/dash'
+        line|contains:
+            - '/bin/bash'
+            - '/bin/sh'
+            - '/bin/dash'
     condition: selection
 level: critical
