@@ -22,6 +22,11 @@ rule_files = glob.glob("splunk/rules/**/*.yml", recursive=True)
 
 SEVERITY_MAP = {"low": "2", "medium": "3", "high": "4", "critical": "5"}
 
+# logsource.category -> Splunk index
+CATEGORY_INDEX_MAP = {
+    "webserver": "web_api",
+}
+
 
 def render_value(real_field, value, modifier):
     if modifier == "contains":
@@ -51,15 +56,22 @@ def build_selection_spl(selection_block):
     return " ".join(terms)
 
 
+def get_index_prefix(logsource):
+    category = logsource.get("category", "")
+    product = logsource.get("product", "")
+    if category in CATEGORY_INDEX_MAP:
+        return f'index="{CATEGORY_INDEX_MAP[category]}" '
+    if product:
+        return f'index="{product}" '
+    return ""
+
+
 def build_spl_from_sigma(rule):
     detection = rule.get("detection", {})
     logsource = rule.get("logsource", {})
-    condition = detection.get("condition", "selection")
+    condition = str(detection.get("condition", "selection"))
 
-    index_prefix = ""
-    product = logsource.get("product", "")
-    if product:
-        index_prefix = f'index="{product}" '
+    index_prefix = get_index_prefix(logsource)
 
     selection_blocks = {
         key: value for key, value in detection.items() if key != "condition"
@@ -77,8 +89,8 @@ def build_spl_from_sigma(rule):
         name: build_selection_spl(block) for name, block in selection_blocks.items()
     }
 
-    condition_lower = condition.lower()
-    if " or " in condition_lower:
+    condition_lower = condition.lower().strip()
+    if " or " in condition_lower or condition_lower.startswith("1 of"):
         joiner = " OR "
     else:
         joiner = " AND "
@@ -107,6 +119,8 @@ for file_path in rule_files:
     if not spl_search:
         print(f"[SKIP] {file_path} üçün SPL qurula bilmədi (detection boşdur)")
         continue
+
+    print(f"[INFO] {safe_rule_name} SPL: {spl_search}")
 
     owner = "nobody"
     app = "search"
@@ -144,8 +158,6 @@ for file_path in rule_files:
     check_response = requests.get(check_url, headers=headers, verify=False)
 
     if check_response.status_code == 200:
-        # Qlobal/paylaşılan (nobody) namespace-i məcburi işlədirik ki,
-        # istifadəçiyə xas gizli surət yaranmasın
         real_owner, real_app = "nobody", "search"
 
         update_payload = {k: v for k, v in payload.items() if k != "name"}
