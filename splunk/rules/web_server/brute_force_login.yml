@@ -1,54 +1,25 @@
 title: Brute Force Login Attempts
 id: 7c1f3a52-9d84-4e6b-b3a1-2f5e8d90c417
 status: experimental
-description: >
-  Eyni mənbə IP-dən qısa müddətdə çoxlu uğursuz giriş cəhdi aşkar edir.
-  Brute force və ya password spraying hücumuna işarə ola bilər.
-author: Sənin Adın
+description: Login endpoint-inə uğursuz cəhdlərin çoxluğu (brute force / credential stuffing).
+author: Veli Sahbazzade
 date: 2026/09/28
-references:
-  - https://attack.mitre.org/techniques/T1110/
 tags:
   - attack.credential_access
   - attack.t1110
-  - attack.t1110.001
-  - attack.t1110.003
 logsource:
-  product: windows
-  service: security
+  category: webserver
 detection:
-  selection:
-    EventID: 4625
-  filter_local:
-    IpAddress:
-      - '127.0.0.1'
-      - '::1'
-      - '-'
-  condition: selection and not filter_local
-fields:
-  - TargetUserName
-  - IpAddress
-  - WorkstationName
-  - LogonType
+  selection_path:
+    path|contains:
+      - '/login'
+      - '/signin'
+      - '/auth'
+  selection_status:
+    status:
+      - 401
+      - 403
+  condition: selection_path and selection_status
 falsepositives:
   - Parolunu unudan istifadəçilər
-  - Səhv konfiqurasiya olunmuş servis hesabları
-  - Vulnerability scanner-lər
-level: high
----
-title: Brute Force Login - Threshold Exceeded
-id: b4e2d6a9-1c37-4f08-a5d2-83e9c1f7a620
-status: experimental
-description: 5 dəqiqə ərzində eyni IP-dən 10-dan çox uğursuz giriş cəhdi.
-author: Sənin Adın
-date: 2026/09/28
-correlation:
-  type: event_count
-  rules:
-    - 7c1f3a52-9d84-4e6b-b3a1-2f5e8d90c417
-  group-by:
-    - IpAddress
-  timespan: 5m
-  condition:
-    gte: 10
 level: high
