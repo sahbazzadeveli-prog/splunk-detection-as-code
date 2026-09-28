@@ -1,12 +1,11 @@
 title: Docker Socket Mounted to Container
 id: 33333333-4444-5555-6666-777777777772
 logsource:
-    product: linux
-    category: process_creation
+    product: docker
+    category: container_logs
 detection:
     selection:
-        CommandLine|contains:
-            - '-v /var/run/docker.sock:/var/run/docker.sock'
-            - '--mount type=bind,src=/var/run/docker.sock'
+        line|contains:
+            - 'docker.sock'
     condition: selection
 level: critical
