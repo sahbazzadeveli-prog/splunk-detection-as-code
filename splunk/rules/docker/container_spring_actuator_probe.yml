@@ -1,0 +1,16 @@
+title: Docker Container Spring4Shell and Actuator Exploit Probe
+id: 2c6e8b94-7d15-4f03-a9b2-e1d5f7a30c86
+logsource:
+    product: docker
+    category: container_logs
+detection:
+    selection:
+        line|contains:
+            - 'class.module.classLoader'
+            - 'class.classLoader'
+            - '/actuator/env'
+            - '/actuator/heapdump'
+            - '/actuator/gateway/routes'
+            - '/jolokia/'
+    condition: selection
+level: critical
