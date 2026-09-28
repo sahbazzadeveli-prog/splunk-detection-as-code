@@ -1,16 +1,31 @@
 title: HTTP Method Abuse or Unauthorized Method Detection
 id: f83a2b1c-7e4d-4a12-9c3f-8b9a1e2f3d4e
 status: experimental
-description: Detects unusual or potentially dangerous HTTP methods.
+description: Detects unusual or potentially dangerous HTTP methods such as PUT, DELETE, TRACE, CONNECT, or PROPFIND which may indicate method tampering or WebDAV exploitation.
+references:
+    - https://owasp.org/www-community/vulnerabilities/Restricted_HTTP_methods
+author: Security Operations
+date: 2026/09/28
+tags:
+    - attack.web_application_attacks
+    - attack.t1190
 logsource:
     category: web_server
 detection:
     selection:
-        * :
-            - 'PUT *'
-            - 'DELETE *'
-            - 'TRACE *'
-            - 'CONNECT *'
-            - 'PROPFIND *'
+        method:
+            - 'PUT'
+            - 'DELETE'
+            - 'TRACE'
+            - 'TRACK'
+            - 'CONNECT'
+            - 'PROPFIND'
+            - 'MKCOL'
+            - 'COPY'
+            - 'MOVE'
+            - 'LOCK'
+            - 'UNLOCK'
     condition: selection
+falsepositives:
+    - Legitimate REST API endpoints that intentionally use PUT or DELETE methods.
 level: medium
