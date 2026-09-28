@@ -3,7 +3,7 @@ id: f83a2b1c-7e4d-4a12-9c3f-8b9a1e2f3d4e
 status: experimental
 description: Detects unusual or potentially dangerous HTTP methods (such as PUT, DELETE, TRACE, CONNECT, PROPFIND) which may indicate method tampering, WebDAV exploitation, or unauthorized API access.
 references:
-    - https://owasp.org/www-community/vulnerabilities/Restricted_HTTP_methods
+    - https://ow_asp.org/www-community/vulnerabilities/Restricted_HTTP_methods
 author: Security Operations
 date: 2026/09/28
 tags:
