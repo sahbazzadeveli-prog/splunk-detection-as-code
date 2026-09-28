@@ -11,10 +11,9 @@ tags:
     - attack.t1190
 logsource:
     category: web_server
-    product: nginx
 detection:
     selection:
-        http_method|insensitive:
+        method|insensitive:
             - 'PUT'
             - 'DELETE'
             - 'TRACE'
