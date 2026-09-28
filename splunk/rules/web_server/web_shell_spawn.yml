@@ -1,7 +1,7 @@
 title: Web Shell Activity Detected in Web Server Requests
 id: 22222222-3333-4444-5555-666666666661
 status: stable
-description: Detects web shell usage in web server logs, either command execution parameters in the URL, well-known web shell filenames, or script files executed from upload directories.
+description: Detects web shell access in web server logs through known web shell filenames, script execution from upload directories, or command strings in the request path.
 references:
     - https://attack.mitre.org/techniques/T1505/003/
 author: Sənin adın
@@ -13,32 +13,32 @@ tags:
 logsource:
     category: webserver
 detection:
-    selection_cmd_params:
-        uri|contains:
-            - 'cmd='
-            - 'exec='
-            - 'command='
-            - 'whoami'
-            - '/bin/sh'
-            - 'cmd.exe'
-            - 'powershell'
     selection_known_shells:
-        uri|contains:
+        path|contains:
             - 'c99.php'
             - 'r57.php'
             - 'wso.php'
             - 'b374k'
             - 'shell.php'
             - 'cmd.aspx'
+    selection_cmd_in_path:
+        path|contains:
+            - 'cmd='
+            - 'exec='
+            - 'whoami'
+            - '/bin/sh'
+            - 'cmd.exe'
+            - 'powershell'
     selection_upload_exec:
-        method: 'POST'
+        method:
+            - 'GET'
+            - 'POST'
         status: 200
-        uri|contains:
+        path|contains:
             - '/uploads/'
             - '/upload/'
-            - '/images/'
             - '/tmp/'
-        uri|endswith:
+        path|endswith:
             - '.php'
             - '.aspx'
             - '.jsp'
