@@ -1,1 +1,0 @@
-# splunk-detection-as-code
